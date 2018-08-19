@@ -1,0 +1,12 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+      "outDir": "./built",
+      "allowJs": true,
+      "target": "es5",
+      "sourceMap": true
+  },
+  "include": [
+      "./src/**/*"
+  ]
+}
