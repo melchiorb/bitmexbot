@@ -2,8 +2,6 @@ import * as request from "request"
 import * as crypto from "crypto"
 import * as bmd from "./bitmexdata"
 
-type Callback = (error: any, response: any, body: string) => void
-
 enum Verb {
   GET = "GET",
   POST = "POST",
@@ -29,7 +27,7 @@ export class BitMex {
       .digest("hex")
   }
 
-  private request(endpoint: string, verb: Verb, data: object, callback: Callback): void {
+  private request(endpoint: string, verb: Verb, data: object): Promise<any> {
     const path = this.basePath + endpoint
     const expires = new Date().getTime() + (60 * 1000)
     const postBody = JSON.stringify(data)
@@ -51,44 +49,35 @@ export class BitMex {
       body: postBody
     }
 
-    request(options, callback)
-  }
-
-  private responseCB<R>(callback: (data: R) => void): any {
-    return (err: any, _: any, body: string): void => {
-      if (err) {
-        console.error(err)
-      } else {
-        let result: R
-
-        try {
-          result = JSON.parse(body)
-        } catch(e) {
-          console.error(e)
+    return new Promise((resolve, reject) => {
+      request(options, (err: any, _, body: string): void => {
+        if (err) {
+          reject(err)
+        } else {
+          try {
+            let result = JSON.parse(body)
+            resolve(result)
+          } catch(e) {
+            reject(e)
+          }
         }
-
-        if (result) callback(result)
-      }
-    }
+      })
+    })
   }
 
-  public getQuote(data: bmd.Req.GetQuote, callback: (data: bmd.Res.Quote) => void): void {
-    const cb = this.responseCB<bmd.Res.Quote>(callback)
-    this.request("quote", Verb.GET, data, cb)
+  public getQuote(data: bmd.Req.GetQuote): Promise<bmd.Res.Quote> {
+    return this.request("quote", Verb.GET, data)
   }
 
-  public createOrder(data: bmd.Req.CreateOrder, callback: (data: bmd.Res.Order) => void): void {
-    const cb = this.responseCB<bmd.Res.Order>(callback)
-    this.request("order", Verb.POST, data, cb)
+  public createOrder(data: bmd.Req.CreateOrder): Promise<bmd.Res.Order> {
+    return this.request("order", Verb.POST, data)
   }
 
-  public getPositions(data: bmd.Req.GetPosition, callback: (data: bmd.Res.Position[]) => void): void {
-    const cb = this.responseCB<bmd.Res.Position[]>(callback)
-    this.request("position", Verb.GET, data, cb)
+  public getPositions(data: bmd.Req.GetPosition): Promise<bmd.Res.Position[]> {
+    return this.request("position", Verb.GET, data)
   }
 
-  public setPositionLeverage(data: bmd.Req.SetPositionLeverage, callback: (data: bmd.Res.Position) => void): void {
-    const cb = this.responseCB<bmd.Res.Position>(callback)
-    this.request("position/leverage", Verb.POST, data, cb)
+  public setPositionLeverage(data: bmd.Req.SetPositionLeverage): Promise<bmd.Res.Position> {
+    return this.request("position/leverage", Verb.POST, data)
   }
 }
