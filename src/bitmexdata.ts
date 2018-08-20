@@ -5,6 +5,13 @@ export enum OrdType {
   StopLimit = "StopLimit"
 }
 
+export enum BinSize {
+  M1 = "1m",
+  M5 = "5m",
+  H1 = "1h",
+  D1 = "1d"
+}
+
 export namespace Req {
   export type GetQuote = {
     symbol: string,
@@ -32,6 +39,23 @@ export namespace Req {
   export type SetPositionLeverage = {
     symbol: string,
     leverage: number
+  }
+
+  export type GetTrades = {
+    symbol: string,
+    filter?: string,
+    count?: number,
+    start?: number,
+    reverse?: boolean
+  }
+
+  export type GetTradesBucketed = {
+    binSize: BinSize,
+    symbol: string,
+    filter?: string,
+    count?: number,
+    start?: number,
+    reverse?: boolean
   }
 }
 
@@ -173,5 +197,34 @@ export namespace Res {
     timestamp?: string,
     lastPrice?: number,
     lastValue?: number
+  }
+
+  export type Trade = {
+    timestamp: string,
+    symbol: string,
+    side?: string,
+    size?: number,
+    price?: number,
+    tickDirection?: string,
+    trdMatchID?: string,
+    grossValue?: number,
+    homeNotional?: number,
+    foreignNotional?: number
+  }
+
+  export type BucketedTrade = {
+    timestamp: string,
+    symbol: string,
+    open?: number,
+    high?: number,
+    low?: number,
+    close?: number,
+    trades?: number,
+    volume?: number,
+    vwap?: number,
+    lastSize?: number,
+    turnover?: number,
+    homeNotional?: number,
+    foreignNotional?: number
   }
 }

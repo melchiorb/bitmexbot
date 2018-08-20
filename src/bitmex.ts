@@ -80,4 +80,12 @@ export class BitMex {
   public setPositionLeverage(data: bmd.Req.SetPositionLeverage): Promise<bmd.Res.Position> {
     return this.request("position/leverage", Verb.POST, data)
   }
+
+  public getTrades(data: bmd.Req.GetTrades): Promise<bmd.Res.Trade[]> {
+    return this.request("trade", Verb.GET, data)
+  }
+
+  public getTradesBucketed(data: bmd.Req.GetTradesBucketed): Promise<bmd.Res.BucketedTrade[]> {
+    return this.request("trade/bucketed", Verb.GET, data)
+  }
 }
