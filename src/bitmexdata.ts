@@ -1,18 +1,8 @@
-export enum OrdType {
-  Market = "Market",
-  Limit = "Limit",
-  Stop = "Stop",
-  StopLimit = "StopLimit"
-}
-
-export enum BinSize {
-  M1 = "1m",
-  M5 = "5m",
-  H1 = "1h",
-  D1 = "1d"
-}
-
 export namespace Req {
+  export type Side = "Buy" | "Sell"
+  export type OrdType = "Market" | "Limit" | "Stop" | "StopLimit"
+  export type BinSize = "1m" | "5m" | "1h" | "1d"
+
   export type GetQuote = {
     symbol: string,
     filter?: string,
@@ -22,7 +12,7 @@ export namespace Req {
 
   export type CreateOrder = {
     symbol: string,
-    side?: "Buy" | "Sell",
+    side?: Side,
     simpleOrderQty?: number,
     orderQty?: number,
     price?: number,
@@ -49,7 +39,7 @@ export namespace Req {
     reverse?: boolean
   }
 
-  export type GetTradesBucketed = {
+  export type GetBucketedTrades = {
     binSize: BinSize,
     symbol: string,
     filter?: string,
