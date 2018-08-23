@@ -62,13 +62,14 @@ export class BitMex {
 
     return new Promise((resolve: any, reject: any): void => {
       request(options, (err: any, _: any, body: string): void => {
-        if (err) { reject(err) }
+        if (err) { console.error(err); reject(err) }
         else {
           try {
             let result = JSON.parse(body)
-            resolve(result)
+            if (result.error != null) { console.error(result.error); reject(result.error) }
+            else { resolve(result) }
           }
-          catch (e) { reject(e) }
+          catch (e) { console.error(e); reject(e) }
         }
       })
     })

@@ -1,7 +1,11 @@
 export namespace Req {
   export type Side = "Buy" | "Sell"
-  export type OrdType = "Market" | "Limit" | "Stop" | "StopLimit"
+  export type OrdType = "Market" | "Limit" | "Stop" | "StopLimit" | "MarketIfTouched" | "LimitIfTouched"
   export type BinSize = "1m" | "5m" | "1h" | "1d"
+  export type ExecInst = "ParticipateDoNotInitiate" | "AllOrNone" | "MarkPrice" | "IndexPrice" | "LastPrice" | "Close" | "ReduceOnly" | "Fixed"
+  export type PegPriceType = "LastPeg" | "MidPricePeg" | "MarketPeg" | "PrimaryPeg" | "TrailingStopPeg"
+  export type TimeInForce = "Day" | "GoodTillCancel" | "ImmediateOrCancel" | "FillOrKill"
+  export type ContingencyType = "OneCancelsTheOther" | "OneTriggersTheOther" | "OneUpdatesTheOtherAbsolute" | "OneUpdatesTheOtherProportional"
 
   export type GetQuote = {
     symbol: string,
@@ -16,8 +20,16 @@ export namespace Req {
     simpleOrderQty?: number,
     orderQty?: number,
     price?: number,
+    displayQty?: number,
     stopPx?: number,
+    clOrdID?: string,
+    clOrdLinkID?: string,
+    pegOffsetValue?: number,
+    pegPriceType?: PegPriceType,
     ordType: OrdType,
+    timeInForce?: TimeInForce,
+    execInst?: ExecInst,
+    contingencyType?: ContingencyType,
     text?: string
   }
 
@@ -138,7 +150,7 @@ export namespace Res {
     grossOpenCost?: number,
     grossOpenPremium?: number,
     grossExecCost?: number,
-    isOpen?: true,
+    isOpen?: boolean,
     markPrice?: number,
     markValue?: number,
     riskValue?: number,
