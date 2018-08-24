@@ -1,19 +1,17 @@
-import {Strategy, StrategyAPI, Ticks, Position, Order, CreateOrder, IndicatorConfigSet} from "./strategy"
+import * as S from "./strategy"
+import * as SD from "./strategydata";
 import * as TI from "technicalindicators"
-import { MAInput } from "technicalindicators/declarations/moving_averages/SMA";
-import { MACDInput } from "technicalindicators/declarations/moving_averages/MACD";
-import { RSIInput } from "technicalindicators/declarations/oscillators/RSI";
-import { BollingerBandsInput } from "technicalindicators/declarations/volatility/BollingerBands";
 
-export abstract class TradeManager implements StrategyAPI {
-  protected _strategies: Strategy[]
-  public timeout = 60000
+export abstract class TradeManager<M> implements S.StrategyAPI {
+  protected _strategies: S.Strategy[]
 
-  public constructor() {
+  public timeout = 1
+
+  public constructor(protected _api: M) {
     this._strategies = []
   }
 
-  public add(strategy: Strategy): void {
+  public add(strategy: S.Strategy): void {
     strategy.API = this
     this._strategies.push(strategy)
   }
@@ -21,54 +19,68 @@ export abstract class TradeManager implements StrategyAPI {
   public loop(): void {
     for (let strategy of this._strategies) {
       console.log(strategy.config.name)
-      
+
       this.process(strategy)
     }
 
-    setTimeout(() => this.loop(), this.timeout)
+    setTimeout(() => this.loop(), this.timeout * 60 * 1000)
   }
-  
-  public abstract async process(strategy: Strategy): Promise<any>
 
-  public abstract async order(strategy: Strategy, settings: any): Promise<any>
-  public abstract async market(strategy: Strategy, orderQty: number, settings?: any): Promise<any>
-  public abstract async limit(strategy: Strategy, orderQty: number, price: number, settings?: any): Promise<any>
-  public abstract async close(strategy: Strategy, ordType: string, settings?: any): Promise<any>
+  public abstract async process(strategy: S.Strategy): Promise<any>
 
-  protected abstract convertTradesForStrategy(data: any): Ticks
-  protected abstract convertPositionsForStrategy(data: any): Position
-  protected abstract convertOrderForStrategy(data: any): Order
-  protected abstract convertOrderFromStrategy(data: CreateOrder): any
+  public abstract async order(strategy: S.Strategy, settings: any): Promise<any>
+  public abstract async market(strategy: S.Strategy, orderQty: number, settings?: any): Promise<any>
+  public abstract async limit(strategy: S.Strategy, orderQty: number, price: number, settings?: any): Promise<any>
+  public abstract async close(strategy: S.Strategy, ordType: string, settings?: any): Promise<any>
 
-  protected processIndicators(data: Ticks, indicators: IndicatorConfigSet): Ticks {
+  protected abstract convertTradesForStrategy(data: any): SD.Ticks
+  protected abstract convertPositionsForStrategy(data: any): SD.Position
+  protected abstract convertOrderForStrategy(data: any): SD.Order
+  protected abstract convertOrderFromStrategy(data: SD.CreateOrder): any
+
+  protected processIndicators(data: SD.Ticks, indicators: S.IndicatorConfigSet): SD.Ticks {
     for (let n in indicators) {
       const src = indicators[n].source || "close"
       const settings = indicators[n].settings
-      const basic = Object.assign(indicators[n].settings, { values: data[src] })
+      const basic = { period: settings.period, values: data[src] }
 
       let result: any = null
-      
+
       switch (indicators[n].type) {
         case "SMA":
-          result = TI.sma(basic as MAInput)
+          result = TI.sma(basic)
           break
         case "EMA":
-          result = TI.ema(basic as MAInput)
+          result = TI.ema(basic)
           break
         case "WMA":
-          result = TI.wma(basic as MAInput)
+          result = TI.wma(basic)
           break
         case "WEMA":
-          result = TI.wema(basic as MAInput)
+          result = TI.wema(basic)
           break
+
         case "MACD":
-          result = TI.macd(basic as MACDInput)
+          result = TI.macd({
+            values: data[src],
+            fastPeriod: settings.fastPeriod,
+            slowPeriod: settings.slowPeriod,
+            signalPeriod: settings.signalPeriod,
+            SimpleMAOscillator: settings.SimpleMAOscillator || true,
+            SimpleMASignal: settings.SimpleMASignal || true
+          })
           break
+
         case "RSI":
-          result = TI.rsi(basic as RSIInput)
+          result = TI.rsi(basic)
           break
+
         case "BollingerBands":
-          result = TI.bollingerbands(basic as BollingerBandsInput)          
+          result = TI.bollingerbands({
+            values: data[src],
+            period: settings.period,
+            stdDev: settings.stdDev || 2
+          })
           break
 
         case "Stochastic":
@@ -78,7 +90,7 @@ export abstract class TradeManager implements StrategyAPI {
             signalPeriod: settings.signalPeriod
           })
           break
-        
+
         case "StochasticRSI":
           result = TI.stochasticrsi({
             values: data[src],
@@ -87,10 +99,11 @@ export abstract class TradeManager implements StrategyAPI {
             kPeriod: settings.kPeriod,
             dPeriod: settings.dPeriod
           })
-        
+
         case "OBV":
           result = TI.obv({ close: data.close, volume: data.volume })
           break
+
         case "VWAP":
           result = TI.vwap({ high: data.high, low: data.low, close: data.close, volume: data.volume })
           break
