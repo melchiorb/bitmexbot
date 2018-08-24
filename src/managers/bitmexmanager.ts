@@ -1,8 +1,8 @@
-import {TradeManager} from "./trademanager"
-import {BitMex} from "./bitmex"
-import * as S from "./strategy"
-import * as SD from "./strategydata"
-import * as BD from "./bitmexdata"
+import {TradeManager} from "../trademanager"
+import {BitMex} from "../bitmex"
+import * as S from "../strategy"
+import * as SD from "../strategydata"
+import * as BD from "../bitmexdata"
 
 export class BitMexManager extends TradeManager<BitMex> implements S.StrategyAPI {
   public async process(strategy: S.Strategy): Promise<any> {
@@ -42,7 +42,7 @@ export class BitMexManager extends TradeManager<BitMex> implements S.StrategyAPI
     console.log(order)
   }
 
-  public async market(strategy: S.Strategy, orderQty: SD.OrdType, settings?: SD.OrderSettings): Promise<any> {
+  public async market(strategy: S.Strategy, orderQty: number, settings?: SD.OrderSettings): Promise<any> {
     this.order(strategy, Object.assign(settings || {}, {
       symbol: strategy.config.symbol,
       ordType: "Market",
