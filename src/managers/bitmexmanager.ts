@@ -6,17 +6,16 @@ import * as BD from "../bitmexdata"
 
 export class BitMexManager extends TradeManager<BitMex> implements S.StrategyAPI {
   public async process(strategy: S.Strategy): Promise<any> {
-    const parameters = {
+    const trades = await this._api.getBucketedTrades({
       symbol: strategy.config.symbol,
       binSize: (strategy.config.binsize as BD.Req.BinSize),
-      count: strategy.config.length
-    }
+      count: strategy.config.length,
+      reverse: true
+    })
 
     const filter = `{"symbol": "${strategy.config.symbol}"}`
     const positions = await this._api.getPositions({ filter: filter })
     const convertedPos = this.convertPositionsForStrategy(positions[0])
-
-    const trades = await this._api.getBucketedTrades(parameters)
 
     let convertedTrades = this.convertTradesForStrategy(trades)
     convertedTrades = this.processIndicators(convertedTrades, strategy.indicators)
@@ -68,9 +67,10 @@ export class BitMexManager extends TradeManager<BitMex> implements S.StrategyAPI
   }
 
   protected convertTradesForStrategy(data: BD.Res.BucketedTrade[]): SD.Ticks {
-    const result: SD.Ticks = { open: [], high: [], low: [], close: [], volume: [], indicators: {} }
+    const result: SD.Ticks = { timestamp:[], open: [], high: [], low: [], close: [], volume: [], indicators: {} }
 
     for (let i = 0; i < data.length; i++) {
+      result.timestamp[i] = data[i].timestamp
       result.open[i] = data[i].open
       result.high[i] = data[i].high
       result.low[i] = data[i].low

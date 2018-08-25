@@ -18,12 +18,10 @@ export abstract class TradeManager<M> implements S.StrategyAPI {
 
   public loop(): void {
     for (let strategy of this._strategies) {
-      console.log(strategy.config.name)
-
       this.process(strategy)
     }
 
-    setTimeout(() => this.loop(), this.timeout * 60 * 1000)
+    setTimeout(this.loop, this.timeout * 60 * 1000)
   }
 
   public abstract async process(strategy: S.Strategy): Promise<any>
@@ -42,7 +40,7 @@ export abstract class TradeManager<M> implements S.StrategyAPI {
     for (let n in indicators) {
       const src = indicators[n].source || "close"
       const settings = indicators[n].settings
-      const basic = { period: settings.period, values: data[src] }
+      const basic = { period: settings.period, values: data[src], reversedInput: true }
 
       let result: any = null
 
@@ -67,7 +65,8 @@ export abstract class TradeManager<M> implements S.StrategyAPI {
             slowPeriod: settings.slowPeriod,
             signalPeriod: settings.signalPeriod,
             SimpleMAOscillator: settings.SimpleMAOscillator || true,
-            SimpleMASignal: settings.SimpleMASignal || true
+            SimpleMASignal: settings.SimpleMASignal || true,
+            reversedInput: true
           })
           break
 
@@ -79,7 +78,8 @@ export abstract class TradeManager<M> implements S.StrategyAPI {
           result = TI.bollingerbands({
             values: data[src],
             period: settings.period,
-            stdDev: settings.stdDev || 2
+            stdDev: settings.stdDev || 2,
+            reversedInput: true
           })
           break
 
@@ -87,7 +87,8 @@ export abstract class TradeManager<M> implements S.StrategyAPI {
           result = TI.stochastic({
             low: data.low, high: data.high, close: data.close,
             period: settings.period,
-            signalPeriod: settings.signalPeriod
+            signalPeriod: settings.signalPeriod,
+            reversedInput: true
           })
           break
 
@@ -97,15 +98,23 @@ export abstract class TradeManager<M> implements S.StrategyAPI {
             rsiPeriod: settings.rsiPeriod,
             stochasticPeriod: settings.stochasticPeriod,
             kPeriod: settings.kPeriod,
-            dPeriod: settings.dPeriod
+            dPeriod: settings.dPeriod,
+            reversedInput: true
           })
+          break
 
         case "OBV":
-          result = TI.obv({ close: data.close, volume: data.volume })
+          result = TI.obv({
+            close: data.close, volume: data.volume,
+            reversedInput: true
+          })
           break
 
         case "VWAP":
-          result = TI.vwap({ high: data.high, low: data.low, close: data.close, volume: data.volume })
+          result = TI.vwap({
+            high: data.high, low: data.low, close: data.close, volume: data.volume,
+            reversedInput: true
+          })
           break
 
         default:

@@ -1,6 +1,7 @@
 export type Dictionary = { [key: string]: any }
 
 export type Ticks = {
+  timestamp: string[],
   open: number[]
   high: number[]
   low: number[]
