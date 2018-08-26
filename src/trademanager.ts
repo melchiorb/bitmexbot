@@ -5,6 +5,7 @@ export abstract class TradeManager implements S.StrategyAPI {
   protected _strategies: S.Strategy[] = []
 
   public timeout = 1
+  public tick: (strategy: S.Strategy) => void
 
   public constructor(protected _api: any) {}
 
@@ -16,6 +17,8 @@ export abstract class TradeManager implements S.StrategyAPI {
   public loop(): void {
     for (let strategy of this._strategies) {
       this.process(strategy)
+
+      if (this.tick) this.tick(strategy)
     }
 
     setTimeout(this.loop, this.timeout * 60 * 1000)

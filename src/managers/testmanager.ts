@@ -38,6 +38,8 @@ export class TestManager extends TradeManager implements S.StrategyAPI {
     while(!this.done) {
       for (let strategy of this._strategies) {
         this.process(strategy)
+
+        if (this.tick) this.tick(strategy)
       }
     }
   }

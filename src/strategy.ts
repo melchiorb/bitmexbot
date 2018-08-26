@@ -21,7 +21,7 @@ export abstract class Strategy {
   private _API: StrategyAPI
 
   public config: Config
-  public output: Dictionary<Series> = {}
+  public output: any = {}
 
   constructor(protected options?: Dictionary<any>) {
     this.init()
@@ -31,6 +31,10 @@ export abstract class Strategy {
 
   public abstract init(): void
   public abstract run(data: Ticks, position: Position): void
+
+  protected show(timestamp: any, values: any) {
+    this.output[timestamp] = values
+  }
 
   protected order(settings: D.CreateOrder): void {
     if (this.config.active) {
