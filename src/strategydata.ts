@@ -1,4 +1,4 @@
-export type Dictionary = { [key: string]: any }
+export type Dictionary<T> = { [key: string]: T }
 
 export type Series = number[]
 

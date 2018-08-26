@@ -4,7 +4,7 @@ import * as SD from "../strategydata"
 
 import * as fs from "fs"
 
-export class TestManager extends TradeManager<{}> implements S.StrategyAPI {
+export class TestManager extends TradeManager implements S.StrategyAPI {
   private trades: SD.Ticks
 
   public position: SD.Position

@@ -1,10 +1,9 @@
 import {TradeManager} from "../trademanager"
-import {BitMex} from "../bitmex"
 import * as S from "../strategy"
 import * as SD from "../strategydata"
 import * as BD from "../bitmexdata"
 
-export class BitMexManager extends TradeManager<BitMex> {
+export class BitMexManager extends TradeManager {
   public async process(strategy: S.Strategy): Promise<any> {
     const trades = await this._api.getBucketedTrades({
       symbol: strategy.config.symbol,

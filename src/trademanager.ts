@@ -1,14 +1,12 @@
 import * as S from "./strategy"
 import * as SD from "./strategydata";
 
-export abstract class TradeManager<M> implements S.StrategyAPI {
-  protected _strategies: S.Strategy[]
+export abstract class TradeManager implements S.StrategyAPI {
+  protected _strategies: S.Strategy[] = []
 
   public timeout = 1
 
-  public constructor(protected _api: M) {
-    this._strategies = []
-  }
+  public constructor(protected _api: any) {}
 
   public add(strategy: S.Strategy): void {
     strategy.API = this
