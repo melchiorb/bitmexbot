@@ -9,14 +9,6 @@ export interface StrategyAPI {
 
 export type OHLCV = "open" | "high" | "low" | "close" | "volume"
 
-export type IndicatorConfig = {
-  type: string,
-  source?: OHLCV,
-  settings?: D.Dictionary
-}
-
-export type IndicatorConfigSet = { [key: string]: IndicatorConfig }
-
 type Config = {
   name: string,
   symbol: string,
@@ -31,7 +23,6 @@ export abstract class Strategy {
   protected options: D.Dictionary
 
   public config: Config
-  public indicators: IndicatorConfigSet
 
   constructor(opt?: D.Dictionary) {
     this.options = opt

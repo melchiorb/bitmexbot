@@ -62,11 +62,9 @@ export class TestManager extends TradeManager<{}> implements S.StrategyAPI {
       this.done = true
     }
 
-    const processedTrades = this.processIndicators(data, strategy.indicators)
-
     this.lastPrice = data.close[0]
 
-    strategy.run(processedTrades, this.position)
+    strategy.run(data, this.position)
 
     this.accountHistory.push(this.account + this.position.currentQty * this.lastPrice)
   }
@@ -111,7 +109,7 @@ export class TestManager extends TradeManager<{}> implements S.StrategyAPI {
   }
 
   protected convertTradesForStrategy(data: any): SD.Ticks {
-    const result: SD.Ticks = { timestamp: [], open: [], high: [], low: [], close: [], volume: [], indicators: {} }
+    const result: SD.Ticks = { timestamp: [], open: [], high: [], low: [], close: [], volume: [] }
 
     for (let i = 0; i < data.length; i++) {
       result.timestamp[i] = data[i].timestamp

@@ -4,7 +4,7 @@ import * as S from "../strategy"
 import * as SD from "../strategydata"
 import * as BD from "../bitmexdata"
 
-export class BitMexManager extends TradeManager<BitMex> implements S.StrategyAPI {
+export class BitMexManager extends TradeManager<BitMex> {
   public async process(strategy: S.Strategy): Promise<any> {
     const trades = await this._api.getBucketedTrades({
       symbol: strategy.config.symbol,
@@ -17,8 +17,7 @@ export class BitMexManager extends TradeManager<BitMex> implements S.StrategyAPI
     const positions = await this._api.getPositions({ filter: filter })
     const convertedPos = this.convertPositionsForStrategy(positions[0])
 
-    let convertedTrades = this.convertTradesForStrategy(trades)
-    convertedTrades = this.processIndicators(convertedTrades, strategy.indicators)
+    const convertedTrades = this.convertTradesForStrategy(trades)
 
     strategy.run(convertedTrades, convertedPos)
   }
@@ -67,7 +66,7 @@ export class BitMexManager extends TradeManager<BitMex> implements S.StrategyAPI
   }
 
   protected convertTradesForStrategy(data: BD.Res.BucketedTrade[]): SD.Ticks {
-    const result: SD.Ticks = { timestamp:[], open: [], high: [], low: [], close: [], volume: [], indicators: {} }
+    const result: SD.Ticks = { timestamp:[], open: [], high: [], low: [], close: [], volume: [] }
 
     for (let i = 0; i < data.length; i++) {
       result.timestamp[i] = data[i].timestamp

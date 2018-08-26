@@ -9,7 +9,6 @@ export type Ticks = {
   low: Series
   close: Series
   volume: Series
-  indicators?: Dictionary
 }
 
 export type Position = {
