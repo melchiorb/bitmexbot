@@ -1,12 +1,14 @@
 export type Dictionary = { [key: string]: any }
 
+export type Series = number[]
+
 export type Ticks = {
   timestamp: string[],
-  open: number[]
-  high: number[]
-  low: number[]
-  close: number[]
-  volume: number[]
+  open: Series
+  high: Series
+  low: Series
+  close: Series
+  volume: Series
   indicators?: Dictionary
 }
 
